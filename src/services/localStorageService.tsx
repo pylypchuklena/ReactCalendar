@@ -1,4 +1,4 @@
-// import { AppState } from "../types/NoteModel";
+// import { AppState } from "../types/DayModel";
 
 // export function loadState(key:number):AppState{
 //     try{
