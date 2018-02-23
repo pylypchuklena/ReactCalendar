@@ -2,17 +2,12 @@ import * as React from 'react';
 import { AppState, DayModel } from '../types/CalendarModel';
 
 interface IPropsDay{
-    // selectedDay: DayModel;
     item:  number;
-    // isChecked: boolean;
-    // OnCheckedDay:()=>void;
+    isChecked: boolean;
+    OnCheckedDay:(day:number)=>void;
 }
 
 export class ItemOfDay extends React.Component<IPropsDay, any>{
-
-    /**
-     *
-     */
     constructor(props:IPropsDay) {
         super(props);
         
@@ -20,12 +15,14 @@ export class ItemOfDay extends React.Component<IPropsDay, any>{
     render(){
         return(
             <li 
-            // className={"dayItem" + 
-            // (this.props.isChecked ? 'selected' : '')
-            // }
-            // onClick={(e)=>{this.props.OnCheckedDay()}}
             >
-                {this.props.item}
+            <span 
+               className={"dayItem " + 
+                (this.props.isChecked ? 'selected' : '')
+                }
+                onClick={(e)=>{console.log("Click"); this.props.OnCheckedDay(this.props.item)}}>
+                    {this.props.item}
+                </span> 
             </li>
         )
     }

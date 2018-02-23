@@ -12,8 +12,11 @@ export class AppComponent extends React.Component<any,AppState>{
         super(props);
         this.OnMovePrev = this.OnMovePrev.bind(this);
         this.OnMoveNext = this.OnMoveNext.bind(this);
-        
-        this.state={currentMonth: new Date(),  checkedDay: false, selectedDay : {id:new Date().getDate(), content: 0, isToday: true} };
+        this.daySelected = this.daySelected.bind(this);
+        var now = new Date();
+        now.setDate(1);
+        this.state={currentMonth: now, 
+            selectedDay:null};
     
     }
     OnMovePrev(){
@@ -27,6 +30,9 @@ export class AppComponent extends React.Component<any,AppState>{
         this.setState({...this.state,currentMonth: monthCurrent});
     }
    
+    daySelected(day:Date){
+        this.setState({...this.state,selectedDay: day});
+    }
 
     render(){
         return(
@@ -35,6 +41,7 @@ export class AppComponent extends React.Component<any,AppState>{
                 OnMoveNext={this.OnMoveNext}
                 OnMovePrev={this.OnMovePrev}/>
                 <ListOfDay selectedDay={this.state.selectedDay} 
+                selectDay={this.daySelected}
                 days={this.state.currentMonth}/>
             </div>
         )

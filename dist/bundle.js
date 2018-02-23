@@ -126,7 +126,11 @@ var AppComponent = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         _this.OnMovePrev = _this.OnMovePrev.bind(_this);
         _this.OnMoveNext = _this.OnMoveNext.bind(_this);
-        _this.state = { currentMonth: new Date(), checkedDay: false, selectedDay: { id: new Date().getDate(), content: 0, isToday: true } };
+        _this.daySelected = _this.daySelected.bind(_this);
+        var now = new Date();
+        now.setDate(1);
+        _this.state = { currentMonth: now,
+            selectedDay: null };
         return _this;
     }
     AppComponent.prototype.OnMovePrev = function () {
@@ -139,10 +143,13 @@ var AppComponent = /** @class */ (function (_super) {
         monthCurrent.setMonth(monthCurrent.getMonth() + 1);
         this.setState(__assign({}, this.state, { currentMonth: monthCurrent }));
     };
+    AppComponent.prototype.daySelected = function (day) {
+        this.setState(__assign({}, this.state, { selectedDay: day }));
+    };
     AppComponent.prototype.render = function () {
         return (React.createElement("div", { className: "container" },
             React.createElement(OptionComponent_1.default, { currentMonth: this.state.currentMonth, OnMoveNext: this.OnMoveNext, OnMovePrev: this.OnMovePrev }),
-            React.createElement(ListOfDay_1.ListOfDay, { selectedDay: this.state.selectedDay, days: this.state.currentMonth })));
+            React.createElement(ListOfDay_1.ListOfDay, { selectedDay: this.state.selectedDay, selectDay: this.daySelected, days: this.state.currentMonth })));
     };
     return AppComponent;
 }(React.Component));
@@ -186,9 +193,9 @@ var OptionComponent = /** @class */ (function (_super) {
     };
     OptionComponent.prototype.render = function () {
         return (React.createElement("div", { className: "flex-row flex-between month" },
-            React.createElement("button", { className: "btn nav-item--btn", onClick: this.props.OnMovePrev }, "Prev"),
+            React.createElement("div", { className: "arrow arrow-left", onClick: this.props.OnMovePrev }),
             React.createElement("h1", null, this.props.currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })),
-            React.createElement("button", { className: "btn nav-item--btn", onClick: this.props.OnMoveNext }, "Next")));
+            React.createElement("div", { className: "arrow arrow-right ", onClick: this.props.OnMoveNext })));
     };
     return OptionComponent;
 }(React.Component));
@@ -220,6 +227,7 @@ var ListOfDay = /** @class */ (function (_super) {
     function ListOfDay(props) {
         var _this = _super.call(this, props) || this;
         _this.daysInMonth = _this.daysInMonth.bind(_this);
+        _this.selectDay = _this.selectDay.bind(_this);
         return _this;
     }
     ListOfDay.prototype.daysInMonth = function (days) {
@@ -227,21 +235,28 @@ var ListOfDay = /** @class */ (function (_super) {
         var month = days.getMonth() + 1;
         return new Date(currentYear, month, 0).getDate();
     };
+    ListOfDay.prototype.selectDay = function (day) {
+        var selectedDay = new Date(this.props.days.getFullYear(), this.props.days.getMonth(), day);
+        this.props.selectDay(selectedDay);
+    };
     ListOfDay.prototype.render = function () {
         var items = [];
-        var FullWeek = 6;
         var fullMonth = this.daysInMonth(this.props.days);
-        var rest = FullWeek - this.props.days.getDay();
+        var rest = this.props.days.getDay();
         var count = 0;
         if (rest != 0) {
-            for (var j = 1; j <= rest; j++) {
+            for (var j = 1; j < rest; j++) {
                 count++;
                 items.push(React.createElement("li", { key: count }));
             }
         }
         for (var i = 1; i <= fullMonth; i++) {
             count++;
-            items.push(React.createElement(ItemOfDay_1.default, { key: count, item: i }));
+            var isChecked = this.props.selectedDay != null &&
+                this.props.selectedDay.getFullYear() == this.props.days.getFullYear() &&
+                this.props.selectedDay.getMonth() == this.props.days.getMonth() &&
+                this.props.selectedDay.getDate() == i;
+            items.push(React.createElement(ItemOfDay_1.default, { key: count, item: i, OnCheckedDay: this.selectDay, isChecked: isChecked }));
         }
         return (React.createElement("div", null,
             React.createElement("ul", { className: "flex-row flex-between weekdays" },
@@ -280,14 +295,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(0);
 var ItemOfDay = /** @class */ (function (_super) {
     __extends(ItemOfDay, _super);
-    /**
-     *
-     */
     function ItemOfDay(props) {
         return _super.call(this, props) || this;
     }
     ItemOfDay.prototype.render = function () {
-        return (React.createElement("li", null, this.props.item));
+        var _this = this;
+        return (React.createElement("li", null,
+            React.createElement("span", { className: "dayItem " +
+                    (this.props.isChecked ? 'selected' : ''), onClick: function (e) { console.log("Click"); _this.props.OnCheckedDay(_this.props.item); } }, this.props.item)));
     };
     return ItemOfDay;
 }(React.Component));

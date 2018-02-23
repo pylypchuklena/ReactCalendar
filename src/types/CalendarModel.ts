@@ -1,8 +1,7 @@
 
 export class AppState{
-    checkedDay: boolean;
     currentMonth: Date;
-    selectedDay:DayModel;
+    selectedDay:Date;
 }
 export class DayModel{
     id: number;

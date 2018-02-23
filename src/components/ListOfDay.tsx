@@ -3,8 +3,9 @@ import { AppState, DayModel } from '../types/CalendarModel';
 import ItemOfDay from './ItemOfDay';
 
 interface IPropsDay {
-    selectedDay: DayModel;
+    selectedDay: Date;
     days: Date;
+    selectDay:(date:Date)=>void;
 }
 
 export class ListOfDay extends React.Component<IPropsDay, any>{
@@ -12,22 +13,27 @@ export class ListOfDay extends React.Component<IPropsDay, any>{
     constructor(props: IPropsDay) {
         super(props);
         this.daysInMonth = this.daysInMonth.bind(this);
-        
-    
+        this.selectDay = this.selectDay.bind(this);
     }
+
     daysInMonth(days: Date) {
         var currentYear = days.getFullYear();
         var month = days.getMonth()+1;
         return  new Date(currentYear, month, 0).getDate();
     }
+
+    selectDay(day:number){
+        var selectedDay = new  Date(this.props.days.getFullYear(),this.props.days.getMonth(),day);
+        this.props.selectDay(selectedDay);
+    }
+
     render() {
         let items = [];
-        let FullWeek = 6;
         var fullMonth = this.daysInMonth(this.props.days);
-        var rest = FullWeek - this.props.days.getDay();
+        var rest = this.props.days.getDay();
         var count = 0;
         if (rest != 0) {
-            for (var j = 1; j <= rest; j++) {
+            for (var j = 1; j < rest; j++) {
                 count++;
                 items.push(<li key={count}></li>)
             }
@@ -35,8 +41,11 @@ export class ListOfDay extends React.Component<IPropsDay, any>{
         
         for (var i = 1; i <= fullMonth;  i++) {
             count++;
-
-            items.push(<ItemOfDay key={count} item ={i}/>)
+            var isChecked = this.props.selectedDay!=null && 
+                        this.props.selectedDay.getFullYear() == this.props.days.getFullYear() &&
+                        this.props.selectedDay.getMonth() == this.props.days.getMonth() &&
+                        this.props.selectedDay.getDate() == i;
+            items.push(<ItemOfDay key={count} item ={i} OnCheckedDay={this.selectDay} isChecked={isChecked}/>)
         }
 
         return (
